@@ -78,7 +78,8 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         UrlForwarderContract.UrlFilterColumns.CREATED,
         UrlForwarderContract.UrlFilterColumns.UPDATED,
         UrlForwarderContract.UrlFilterColumns.SKIP_ENCODE,
-        UrlForwarderContract.UrlFilterColumns.REPLACE_SUBJECT
+        UrlForwarderContract.UrlFilterColumns.REPLACE_SUBJECT,
+        UrlForwarderContract.UrlFilterColumns.REGEX_PATTERN,
     )
 
     override suspend fun queryFilter(filterId: Long): LinkFilter? = withContext(Dispatchers.IO) {
@@ -121,7 +122,8 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         created = getLong(4),
         updated = getLong(5),
         encoded = getShort(6).toInt() != 1,
-        replaceSubject = getString(7)
+        replaceSubject = getString(7),
+        regexPattern = getString(8)
     )
 
     private fun getValues(filter: LinkFilter): ContentValues = ContentValues().apply {
@@ -132,5 +134,6 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         put(UrlForwarderContract.UrlFilterColumns.REPLACE_TEXT, filter.replaceText)
         put(UrlForwarderContract.UrlFilterColumns.SKIP_ENCODE, !filter.encoded)
         put(UrlForwarderContract.UrlFilterColumns.REPLACE_SUBJECT, filter.replaceSubject)
+        put(UrlForwarderContract.UrlFilterColumns.REGEX_PATTERN, filter.regexPattern)
     }
 }

@@ -51,6 +51,12 @@ class LinkDialogActivity : ComponentActivity() {
             finish()
             return
         }
+//        # this
+//        val res = "https://archive.is/newest/$url"
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        startActivity(Intent(Intent.ACTION_VIEW, res.toUri()))
+//        finish()
+
 
         setContent {
             UrlForwarderTheme {
