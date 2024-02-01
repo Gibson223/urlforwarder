@@ -20,6 +20,7 @@ interface FilterDao {
     fun queryFilters(): Flow<List<LinkFilter>>
     fun queryRegexFilters(): Flow<List<LinkFilter>>
 
+    fun queryAllRegexFilters(): List<LinkFilter>
     suspend fun queryFilter(filterId: Long): LinkFilter?
 }
 
@@ -107,7 +108,7 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         }
     }
 
-    fun queryAllRegexFilters(): List<LinkFilter> = dbHelper.readableDatabase?.query(
+    override fun queryAllRegexFilters(): List<LinkFilter> = dbHelper.readableDatabase?.query(
         UrlForwardDatabaseHelper.TABLE_FILTER,
         columns,
         "${UrlForwarderContract.UrlFilterColumns.REGEX_PATTERN} != ?",

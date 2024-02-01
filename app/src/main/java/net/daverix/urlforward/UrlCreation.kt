@@ -19,16 +19,9 @@ package net.daverix.urlforward
 
 import java.net.URLEncoder
 
-fun createUrl(linkFilter: LinkFilter, url: String?, subject: String?): String {
+fun createUrl(linkFilter: LinkFilter, url: String?, subject: String?, other_matches: List<Pair<String, String>>?): String {
     var filteredUrl = linkFilter.filterUrl
 
-//    if (linkFilter.regexPattern.isNotEmpty() && url != null) {
-//        val regex = Regex(linkFilter.regexPattern)
-//        for ((pattern, replacement) in replacements) {
-//            replacedString = replacedString.replace(Regex(pattern), replacement)
-//        }
-//        filteredUrl = filteredUrl.replace(, URLEncoder.encode(subject, "UTF-8"))
-//    }
 
     val replaceText = linkFilter.replaceText
     if (replaceText.isNotEmpty() && url != null) {
@@ -39,6 +32,12 @@ fun createUrl(linkFilter: LinkFilter, url: String?, subject: String?): String {
     val replaceSubject = linkFilter.replaceSubject
     if (replaceSubject.isNotEmpty() && subject != null) {
         filteredUrl = filteredUrl.replace(replaceSubject, URLEncoder.encode(subject, "UTF-8"))
+    }
+
+    if (other_matches != null  && other_matches.isNotEmpty() && url != null) {
+        for ((to_replace, replacement) in other_matches) {
+            filteredUrl = filteredUrl.replace(to_replace, replacement)
+        }
     }
 
     return filteredUrl

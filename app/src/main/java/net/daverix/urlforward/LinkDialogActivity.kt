@@ -39,7 +39,7 @@ import net.daverix.urlforward.ui.UrlForwarderTheme
 
 @AndroidEntryPoint
 class LinkDialogActivity : ComponentActivity() {
-    private val filterDao: FilterDao = DefaultFilterDao(this)
+    private val filterDao: DefaultFilterDao = DefaultFilterDao(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,13 +61,20 @@ class LinkDialogActivity : ComponentActivity() {
             finish()
             return
         }
-        runBlocking {
-            filterDao.queryRegexFilters().collect { filters ->
-                filters.forEach { filter ->
-                    if (url.matches(Regex(filter.regexPattern))) {
-                        Log.e("LinkDialogActivity", filter.regexPattern)
-                    }
-                }
+
+        filterDao.queryAllRegexFilters().forEach { filter ->
+            if (url.matches(Regex(filter.regexPattern))) {
+                val group_values = Regex(filter.regexPattern).matchEntire(url)!!.groupValues
+                val group_values_without_full_match = group_values.subList(1, group_values.size)
+                // List<Pair<\1,first_group_value>>
+                val endless_regex_group_strings: List<String> = generateSequence(1) { it + 1}
+                    .map { "\\${it}"}
+                    .take(group_values_without_full_match.size).toList()
+
+                val regex_group_with_group_values: List<Pair<String,String>> = group_values_without_full_match.zip(endless_regex_group_strings)
+
+                createUrl(filter, url, subject, regex_group_with_group_values)
+                Log.e("LinkDialogActivity", filter.regexPattern)
             }
         }
 
