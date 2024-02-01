@@ -22,6 +22,14 @@ import java.net.URLEncoder
 fun createUrl(linkFilter: LinkFilter, url: String?, subject: String?): String {
     var filteredUrl = linkFilter.filterUrl
 
+//    if (linkFilter.regexPattern.isNotEmpty() && url != null) {
+//        val regex = Regex(linkFilter.regexPattern)
+//        for ((pattern, replacement) in replacements) {
+//            replacedString = replacedString.replace(Regex(pattern), replacement)
+//        }
+//        filteredUrl = filteredUrl.replace(, URLEncoder.encode(subject, "UTF-8"))
+//    }
+
     val replaceText = linkFilter.replaceText
     if (replaceText.isNotEmpty() && url != null) {
         val encodedUrl = if (linkFilter.encoded) URLEncoder.encode(url, "UTF-8") else url

@@ -24,17 +24,27 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
+import net.daverix.urlforward.db.DefaultFilterDao
+import net.daverix.urlforward.db.FilterDao
 import net.daverix.urlforward.ui.LinkDialogScreen
 import net.daverix.urlforward.ui.UrlForwarderTheme
 
 @AndroidEntryPoint
 class LinkDialogActivity : ComponentActivity() {
+    private val filterDao: FilterDao = DefaultFilterDao(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Log.e("LinkDialogActivity", "startup")
         val intent = intent
         if (intent == null) {
             Toast.makeText(this, "Invalid intent!", Toast.LENGTH_SHORT).show()
@@ -51,12 +61,15 @@ class LinkDialogActivity : ComponentActivity() {
             finish()
             return
         }
-//        # this
-//        val res = "https://archive.is/newest/$url"
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        startActivity(Intent(Intent.ACTION_VIEW, res.toUri()))
-//        finish()
-
+        runBlocking {
+            filterDao.queryRegexFilters().collect { filters ->
+                filters.forEach { filter ->
+                    if (url.matches(Regex(filter.regexPattern))) {
+                        Log.e("LinkDialogActivity", filter.regexPattern)
+                    }
+                }
+            }
+        }
 
         setContent {
             UrlForwarderTheme {
@@ -68,6 +81,13 @@ class LinkDialogActivity : ComponentActivity() {
             }
         }
     }
+
+
+//        # this
+//        val res = "https://archive.is/newest/$url"
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        startActivity(Intent(Intent.ACTION_VIEW, res.toUri()))
+//        finish()
 
     private fun startActivityFromUrl(url: String) {
         try {

@@ -18,6 +18,7 @@ interface FilterDao {
     suspend fun delete(filterId: Long)
 
     fun queryFilters(): Flow<List<LinkFilter>>
+    fun queryRegexFilters(): Flow<List<LinkFilter>>
 
     suspend fun queryFilter(filterId: Long): LinkFilter?
 }
@@ -70,6 +71,14 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         })
     }.flowOn(Dispatchers.IO)
 
+    override fun queryRegexFilters(): Flow<List<LinkFilter>> = flow {
+        emit(queryAllRegexFilters())
+
+        emitAll(updated.map {
+            queryAllRegexFilters()
+        })
+    }.flowOn(Dispatchers.IO)
+
     private val columns = arrayOf(
         BaseColumns._ID,
         UrlForwarderContract.UrlFilterColumns.TITLE,
@@ -98,6 +107,21 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         }
     }
 
+    fun queryAllRegexFilters(): List<LinkFilter> = dbHelper.readableDatabase?.query(
+        UrlForwardDatabaseHelper.TABLE_FILTER,
+        columns,
+        "${UrlForwarderContract.UrlFilterColumns.REGEX_PATTERN} != ?",
+        arrayOf(""),
+        null,
+        null,
+        null
+    )?.use { cursor ->
+        val items = mutableListOf<LinkFilter>()
+        while (cursor.moveToNext()) {
+            items += cursor.toFilter()
+        }
+        items
+    } ?: emptyList()
     private fun queryAllFilters(): List<LinkFilter> = dbHelper.readableDatabase?.query(
         UrlForwardDatabaseHelper.TABLE_FILTER,
         columns,
