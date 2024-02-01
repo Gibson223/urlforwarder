@@ -21,7 +21,7 @@ class LinkDialogViewModel @Inject constructor(
     fun load(url: String, subject: String?) {
         viewModelScope.launch {
             _state.value = DialogState.Filters(filterDao.queryFilters().first().map {
-                val urlToOpen = createUrl(it, url, subject, null)
+                val urlToOpen = createUrl(it, url, subject)
 
                 LinkDialogListItem(
                     name = it.name,

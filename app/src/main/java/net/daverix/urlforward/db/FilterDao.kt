@@ -115,7 +115,7 @@ class DefaultFilterDao @Inject constructor(context: Context) : FilterDao {
         arrayOf(""),
         null,
         null,
-        null
+        "${UrlForwarderContract.UrlFilterColumns.TITLE} DESC"
     )?.use { cursor ->
         val items = mutableListOf<LinkFilter>()
         while (cursor.moveToNext()) {

@@ -13,6 +13,7 @@ class UrlCreationTest(
     private val encoded: Boolean,
     private val url: String,
     private val subject: String,
+    private val regexPattern: String,
     private val expected: String
 ) {
     @Test
@@ -25,10 +26,10 @@ class UrlCreationTest(
             name = "some filter",
             created = 0,
             updated = 1,
-            regexPattern = ""
+            regexPattern = regexPattern
         )
 
-        val actual = createUrl(filter, url, subject, null)
+        val actual = createUrl(filter, url, subject)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -44,9 +45,8 @@ class UrlCreationTest(
                 false,
                 "https://example.com/companyname/wow",
                 "doesnotmatter",
-                "https://example.com/(.*)",
+                "https://example.com/([^/]*).*",
                 "https://wikipedia.com/companyname",
-//                "https://testing.com/extra/b/"
             ),
             arrayOf(
                 "https://example.com/submit?url=@url",
@@ -55,6 +55,7 @@ class UrlCreationTest(
                 true,
                 "https://someurl.com",
                 "something",
+                "",
                 "https://example.com/submit?url=https%3A%2F%2Fsomeurl.com"
             ),
             arrayOf(
@@ -64,6 +65,7 @@ class UrlCreationTest(
                 true,
                 "https://someurl.com",
                 "something",
+                "",
                 "https://example.com/submit?url=https%3A%2F%2Fsomeurl.com"
             ),
             arrayOf(
@@ -72,6 +74,7 @@ class UrlCreationTest(
                 "@subject",
                 true,
                 "https://someurl.com",
+                "",
                 "",
                 "https://example.com/submit?url=https%3A%2F%2Fsomeurl.com&subject="
             ),
@@ -82,6 +85,7 @@ class UrlCreationTest(
                 true,
                 "https://someurl.com",
                 "something",
+                "",
                 "https://example.com/submit?url=https%3A%2F%2Fsomeurl.com&subject=something"
             ),
             arrayOf(
@@ -91,6 +95,7 @@ class UrlCreationTest(
                 true,
                 "bananas",
                 "something",
+                "",
                 "https://example.com/stuff/bananas"
             ),
         )

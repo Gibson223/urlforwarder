@@ -24,16 +24,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.collectAsState
 import androidx.core.net.toUri
-import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toCollection
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import net.daverix.urlforward.db.DefaultFilterDao
-import net.daverix.urlforward.db.FilterDao
 import net.daverix.urlforward.ui.LinkDialogScreen
 import net.daverix.urlforward.ui.UrlForwarderTheme
 
@@ -62,19 +55,14 @@ class LinkDialogActivity : ComponentActivity() {
             return
         }
 
+        // regex enabled means automatic redirect allowed
         filterDao.queryAllRegexFilters().forEach { filter ->
             if (url.matches(Regex(filter.regexPattern))) {
-                val group_values = Regex(filter.regexPattern).matchEntire(url)!!.groupValues
-                val group_values_without_full_match = group_values.subList(1, group_values.size)
-                // List<Pair<\1,first_group_value>>
-                val endless_regex_group_strings: List<String> = generateSequence(1) { it + 1}
-                    .map { "\\${it}"}
-                    .take(group_values_without_full_match.size).toList()
-
-                val regex_group_with_group_values: List<Pair<String,String>> = group_values_without_full_match.zip(endless_regex_group_strings)
-
-                createUrl(filter, url, subject, regex_group_with_group_values)
-                Log.e("LinkDialogActivity", filter.regexPattern)
+                val result = createUrl(filter, url, subject)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(Intent(Intent.ACTION_VIEW, result.toUri()))
+                Log.d("LinkDialogActivity", result)
+                finish()
             }
         }
 

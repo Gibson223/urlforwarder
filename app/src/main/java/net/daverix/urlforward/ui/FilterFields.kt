@@ -140,18 +140,19 @@ fun FilterFields(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(id = R.string.save_filter_info),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
         footerContent?.let {
             Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                 footerContent()
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(id = R.string.save_filter_info),
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
     }
 }
 
