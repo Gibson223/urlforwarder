@@ -10,7 +10,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 24
         targetSdk = 33
         versionCode = 12
         versionName = "0.5.0"
@@ -18,10 +18,11 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
-        }
+//        getByName("release") {
+//            signingConfig = signingConfigs.getByName("debug")
+//        }
         named("release") {
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.txt")
