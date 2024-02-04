@@ -26,18 +26,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.net.toUri
 import dagger.hilt.android.AndroidEntryPoint
-import net.daverix.urlforward.db.DefaultFilterDao
 import net.daverix.urlforward.ui.LinkDialogScreen
 import net.daverix.urlforward.ui.UrlForwarderTheme
 
 @AndroidEntryPoint
 class LinkDialogActivity : ComponentActivity() {
-    private val filterDao: DefaultFilterDao = DefaultFilterDao(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.e("LinkDialogActivity", "startup")
         val intent = intent
         if (intent == null) {
             Toast.makeText(this, "Invalid intent!", Toast.LENGTH_SHORT).show()
@@ -55,17 +52,6 @@ class LinkDialogActivity : ComponentActivity() {
             return
         }
 
-        // regex enabled means automatic redirect allowed
-        filterDao.queryAllRegexFilters().forEach { filter ->
-            if (url.matches(Regex(filter.regexPattern))) {
-                val result = createUrl(filter, url, subject)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(Intent(Intent.ACTION_VIEW, result.toUri()))
-                Log.d("LinkDialogActivity", result)
-                finish()
-            }
-        }
-
         setContent {
             UrlForwarderTheme {
                 LinkDialogScreen(
@@ -76,13 +62,6 @@ class LinkDialogActivity : ComponentActivity() {
             }
         }
     }
-
-
-//        # this
-//        val res = "https://archive.is/newest/$url"
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        startActivity(Intent(Intent.ACTION_VIEW, res.toUri()))
-//        finish()
 
     private fun startActivityFromUrl(url: String) {
         try {
